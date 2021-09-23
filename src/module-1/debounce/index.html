@@ -6,7 +6,7 @@
 <body>
 
 <script type="module">
-  import { debounce } from './solution';
+  import { debounce } from './index.js';
 
   const obj = {
     nickname: 'John',
@@ -20,6 +20,7 @@
   }, 1000);
 
   const debounceGetName = debounce(obj.getName);
+
 
   // Note: should log "1" only one time
   console.error(debounceLog(1, 2));
