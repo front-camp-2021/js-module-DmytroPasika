@@ -1,11 +1,11 @@
 export const debounce = (fn, delay = 0) => {
-  let timeout = undefined;
+  let timeout = null;
 
   return function () {
     const fnCall = () => fn.apply(this, arguments);
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      timeout = undefined;
+      timeout = null;
       console.log(fnCall())
     }, delay)
   };
