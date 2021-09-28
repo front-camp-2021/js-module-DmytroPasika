@@ -21,138 +21,69 @@ export default class Card {
     this.render();
   }
 
+  getTemplate() {
+    return `<div class="card" id='${this.id}'>
+    <div class="card__content">
+      <div class="card__image-container">
+        <img class='card__image' src="${this.images[0]}" alt="Product image">
+      </div>
+      <div class="card__description">
+        <div class='card__price-and-score'>
+          <div class='card__score'>
+            <button name='scoreButton' class="card__score-button button">
+              <div class="card__container-btn">
+                <span class="card__score-text">
+                  ${this.rating}
+                </span>
+                <img src="../img/star.svg" alt="score image" class='card__score-image-btn'>
+              </div>
+            </button>
+          </div>
+          <div class="card__price">
+          ₴${this.price}
+          </div>
+        </div>
+        <div class='card__description-text'>
+          <span class="card__header">${this.title}</span>
+          <span class='card__text'>Redesigned from scratch and completely revised.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card__actions">
+      <button class='card__wishlist-btn button' name="wishlist">
+        <div class="card__container-btn">
+          <img class="card__heart" src="../img/Path.svg" alt='Like image'>
+          <div class="card__text-btn">WISHLIST</div>
+        </div>
+      </button>
+      <button class='card__add-btn button' name="addToCart">
+        <div class="card__container-btn">
+          <img class='card__add-to-cart' src="../img/shopping-bag.svg" alt="Shop">
+          <div class="card__text-btn">ADD TO CART</div>
+        </div>
+      </button>
+    </div>
+  </div>`
+  }
+
   render() {
+    const wrapper = document.createElement('div');
 
-    const cardContainer = document.createElement('div');
-    cardContainer.className = 'card';
-    cardContainer.id = this.id;
+    wrapper.innerHTML = this.getTemplate();
 
+    this.element = wrapper.firstElementChild;
+  }
 
-    const cardContent = document.createElement('div');
-    cardContent.className = 'card__content';
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
 
-    const cardAction = document.createElement('div');
-    cardAction.className = 'card__actions';
-
-    const cardImmageContainer = document.createElement('div');
-    cardImmageContainer.className = 'card__image-container'
-
-    const cardImmage = document.createElement('img');
-    cardImmage.className = 'card__image';
-    cardImmage.src = this.images[0];
-    cardImmage.alt = 'Product imagge';
-
-    const cardDescription = document.createElement('div');
-    cardDescription.className = 'card__description';
-
-    const cardPriceAndScore = document.createElement('div');
-    cardPriceAndScore.className = 'card__price-and-score';
-
-    const cardScore = document.createElement('div');
-    cardScore.className = 'card__score';
-
-    const cardScoreButton = document.createElement('button');
-    cardScoreButton.className = 'card__score-button button';
-
-    const cardContainerScoreBtn = document.createElement('div');
-    cardContainerScoreBtn.className = 'card__container-btn';
-
-    const cardScoreText = document.createElement('span');
-    cardScoreText.className = 'card__score-text';
-    cardScoreText.textContent = `${this.rating}`;
-
-    const cardScoreImaggeBtn = document.createElement('img');
-    cardScoreImaggeBtn.className = 'card__score-image-btn';
-    cardScoreImaggeBtn.src = '../img/star.svg';
-    cardScoreImaggeBtn.alt = 'Score image';
-
-    const cardPrice = document.createElement('div');
-    cardPrice.className = 'card__price';
-    cardPrice.textContent = `₴${this.price}`;
-
-
-    const cardDescriptionText = document.createElement('div');
-    cardDescriptionText.className = 'card__description-text';
-
-    const cardHeader = document.createElement('span');
-    cardHeader.className = 'card__header';
-    cardHeader.textContent = `${this.title}`;
-
-    const cardText = document.createElement('span');
-    cardText.className = 'card__text';
-    cardText.textContent = 'Redesigned from scratch and completely revised.';
-
-
-    const cardWishlistBtn = document.createElement('button');
-    cardWishlistBtn.className = 'card__wishlist-btn button';
-
-    const cardAddBtn = document.createElement('button');
-    cardAddBtn.className = 'card__add-btn button';
-
-    const cardContainerWishlistBtn = document.createElement('div');
-    cardContainerWishlistBtn.className = 'card__container-btn';
-
-    const cardContainerAddBtn = document.createElement('div');
-    cardContainerAddBtn.className = 'card__container-btn';
-
-    const cardHeartImage = document.createElement('img');
-    cardHeartImage.className = 'card__heart';
-    cardHeartImage.src = '../img/Path.svg';
-    cardHeartImage.alt = 'Like image';
-
-    const cardTextWishBtn = document.createElement('div');
-    cardTextWishBtn.className = 'card__text-btn';
-    cardTextWishBtn.textContent = 'WISHLIST';
-
-    const cardAddToCartImage = document.createElement('img');
-    cardAddToCartImage.className = 'card__add-to-cart';
-    cardAddToCartImage.src = '../img/shopping-bag.svg';
-    cardAddToCartImage.alt = 'Shop image';
-
-    const cardTextAddBtn = document.createElement('div');
-    cardTextAddBtn.className = 'card__text-btn';
-    cardTextAddBtn.textContent = 'ADD TO CART';
-
-
-    cardContainer.append(cardContent);
-    cardContainer.append(cardAction);
-
-    cardContent.append(cardImmageContainer);
-    cardImmageContainer.append(cardImmage);
-
-    cardContent.append(cardDescription);
-
-
-
-    cardDescription.append(cardPriceAndScore);
-    cardPriceAndScore.append(cardScore);
-    cardScore.append(cardScoreButton);
-    cardScoreButton.append(cardContainerScoreBtn);
-    cardContainerScoreBtn.append(cardScoreText);
-    cardContainerScoreBtn.append(cardScoreImaggeBtn);
-    cardPriceAndScore.append(cardPrice);
-
-    cardDescription.append(cardDescriptionText);
-    cardDescriptionText.append(cardHeader);
-    cardDescriptionText.append(cardText);
-
-    cardAction.append(cardWishlistBtn);
-    cardAction.append(cardAddBtn);
-
-    cardWishlistBtn.append(cardContainerWishlistBtn);
-    cardAddBtn.append(cardContainerAddBtn);
-
-    cardContainerWishlistBtn.append(cardHeartImage);
-    cardContainerWishlistBtn.append(cardTextWishBtn);
-
-    cardContainerAddBtn.append(cardAddToCartImage);
-    cardContainerAddBtn.append(cardTextAddBtn);
-
-
-
-
-    this.element = cardContainer;
-    // ... your logic
+  destroy() {
+    this.remove();
+    this.element = null;
   }
 }
 
