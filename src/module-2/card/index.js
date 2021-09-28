@@ -72,7 +72,7 @@ export default class Card {
 
     wrapper.innerHTML = this.getTemplate();
 
-    this.element = wrapper.firstElementChild;
+    this.element = wrapper;
   }
 
   remove() {
