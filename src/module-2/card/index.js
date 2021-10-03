@@ -22,7 +22,7 @@ export default class Card {
   }
 
   getTemplate() {
-    return `<div class="card" id='${this.id}'>
+    return `<div class="card" id='${this.id}' data-element="body">
     <div class="card__content">
       <div class="card__image-container">
         <img class='card__image' src="${this.images[0]}" alt="Product image">
@@ -44,6 +44,7 @@ export default class Card {
           </div>
         </div>
         <div class='card__description-text'>
+          <span class="card__title">${this.brand} ${this.category}</span>
           <span class="card__header">${this.title}</span>
           <span class='card__text'>Redesigned from scratch and completely revised.</span>
         </div>
