@@ -8,7 +8,7 @@ export default class CardsList {
     this.render();
   }
 
-  getTemplate(){
+  get template(){
   return `<div class="cards__list">
     ${this.data.map(d => new this.Component(d).element.innerHTML).join('')}
     </div>`
@@ -17,7 +17,7 @@ export default class CardsList {
   render() {
     const wrapper = document.createElement('div');
 
-    wrapper.innerHTML = this.getTemplate();
+    wrapper.innerHTML = this.template;
     this.element = wrapper;
   }
 
@@ -26,9 +26,10 @@ export default class CardsList {
     this.render();
   }
 
-  remove(id = 0) {
-    this.data = this.data.filter(d => d.id !== id);
-    this.render();
+  remove() {
+    if(this.element) {
+      this.element.remove();
+    }
   }
 
   destroy() {
