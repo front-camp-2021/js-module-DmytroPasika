@@ -26,10 +26,6 @@ export default class DoubleSlider {
   }
 
   get template() {
-    console.log(this.formatValue1)
-    console.log(this.formatValue2)
-    console.log('percent 1 ====', this.percent1)
-    console.log('percent 2 ====', this.percent2)
     return `<div class="filter-container__slider-container">
         <div class="filter-container__title">
           ${this.title}
