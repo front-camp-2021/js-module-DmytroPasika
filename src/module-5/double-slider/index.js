@@ -1,81 +1,216 @@
 export default class DoubleSlider {
   element;
+  subElements = {};
+
   constructor({
     min = 100,
     max = 200,
-    formatValue = value => value,
+    formatValue = (value) => value,
     selected = {
       from: min,
-      to: max
+      to: max,
     },
     precision = 0,
-    filterName = ''
+    filterName = "",
   } = {}) {
-    
-    this.max = max;
     this.min = min;
-    this.selectedMin = selected['from'];
-    this.selectedMax = selected['to'];
-    this.step = precision;
-    this.percent1 = 0;
-    this.percent2 = 100;
-    this.formatValue1 = function (price) { return formatValue(price)}
-    this.formatValue2 = function (price) { return formatValue(price)}
-    this.title = filterName;
+    this.max = max;
+    this.formatValue = formatValue;
+    this.selected = selected;
+    this.precision = 10 ** precision;
+    this.filterName = filterName;
+
     this.render();
+  }
+
+  getValueFromSlider() {
+    const rangeTotal = this.max - this.min;
+    const { left } = this.subElements.thumbLeft.style;
+    const { right } = this.subElements.thumbRight.style;
+    
+    const leftShift = (parseFloat(left) * rangeTotal) / 100;
+    const rightShift = (parseFloat(right) * rangeTotal) / 100;
+
+    const from =
+      Math.round((this.min + leftShift) * this.precision) / this.precision;
+    const to =
+      Math.round((this.max - rightShift) * this.precision) / this.precision;
+
+    return { from, to };
+  }
+
+  // Events Handlers
+  sliderDownEvent(event) {
+    const thumbElem = event.target;
+
+    event.preventDefault();
+
+    const { left, right } = thumbElem.getBoundingClientRect();
+
+    if (thumbElem === this.subElements.thumbLeft) {
+      this.shiftX = right - event.clientX;
+    } else {
+      this.shiftX = left - event.clientX;
+    }
+
+    this.dragging = thumbElem;
+    this.element.classList.add("range-slider_dragging");
+
+    document.addEventListener("pointermove", this.sliderMoveEvent);
+    document.addEventListener("pointerup", this.sliderUpEvent);
+  }
+
+  sliderUpEvent = () => {
+    this.element.classList.remove("range-slider_dragging");
+
+    document.removeEventListener("pointermove", this.sliderMoveEvent);
+    document.removeEventListener("pointerup", this.sliderUpEvent);
+
+    this.element.dispatchEvent(
+      new CustomEvent("range-selected", {
+        bubbles: true,
+        detail: {
+          filterName: this.filterName,
+          value: this.getValueFromSlider(),
+        },
+      })
+    );
+  };
+
+  sliderMoveEvent = (event) => {
+    event.preventDefault();
+
+    const {
+      left: innerLeft,
+      right: innerRight,
+      width,
+    } = this.subElements.inner.getBoundingClientRect();
+
+    if (this.dragging === this.subElements.thumbLeft) {
+      let newLeft = (event.clientX - innerLeft + this.shiftX) / width;
+
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      newLeft *= 100;
+
+      const right = parseFloat(this.subElements.thumbRight.style.right);
+
+      if (newLeft + right > 100) {
+        newLeft = 100 - right;
+      }
+
+      this.dragging.style.left = this.subElements.progress.style.left =
+        newLeft + "%";
+      this.subElements.from.innerHTML = this.formatValue(
+        this.getValueFromSlider().from
+      );
+    }
+
+    if (this.dragging === this.subElements.thumbRight) {
+      let newRight = (innerRight - event.clientX - this.shiftX) / width;
+
+      if (newRight < 0) {
+        newRight = 0;
+      }
+      newRight *= 100;
+
+      const left = parseFloat(this.subElements.thumbLeft.style.left);
+
+      if (left + newRight > 100) {
+        newRight = 100 - left;
+      }
+      this.dragging.style.right = this.subElements.progress.style.right =
+        newRight + "%";
+      this.subElements.to.innerHTML = this.formatValue(
+        this.getValueFromSlider().to
+      );
+    }
+  };
+
+  update(from = this.selected.from, to = this.selected.to) {
+    const rangeTotal = this.max - this.min;
+    const left = Math.floor(((from - this.min) / rangeTotal) * 100) + "%";
+    const right = Math.floor(((this.max - to) / rangeTotal) * 100) + "%";
+
+    this.subElements.progress.style.left = left;
+    this.subElements.progress.style.right = right;
+    this.subElements.thumbLeft.style.left = left;
+    this.subElements.thumbRight.style.right = right;
+    
+    this.subElements.from.innerText = this.formatValue(from);
+    this.subElements.to.innerText = this.formatValue(to);
+    
   }
 
   get template() {
-    return `<div class="filter-container__slider-container">
-        <div class="filter-container__title">
-          ${this.title}
+    const { from, to } = this.selected;
+    return `
+        <div class="range-slider">
+          <span data-element="from">${this.formatValue(from)}</span>
+          <div data-element="inner" class="range-slider__inner">
+            <span data-element="progress" class="range-slider__progress"></span>
+            <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
+            <span data-element="thumbRight" class="range-slider__thumb-right"></span>
+          </div>
+          <span data-element="to">${this.formatValue(to)}</span>
         </div>
-    <div id="range1" class='filter-container__range'>
-        ${this.formatValue1(this.selectedMin)}
-    </div>
-    <div class="filter-container__slider" style="background:">
-        <div class="filter-container__slider-track" style="background:linear-gradient(to right, rgb(218, 218, 229) ${this.percent1}% , rgb(111, 100, 248) ${this.percent1}% , rgb(111, 100, 248) ${this.percent2}%, rgb(218, 218, 229) ${this.percent2}%)"></div>
-        <input type="range" min="${this.min}" max="${this.max}" value="${this.selectedMin}" step="${this.step}" id="slider-1" class='filter-container__range-input-1'>
-        <input type="range" min="${this.min}" max="${this.max}" value="${this.selectedMax}" step="${this.step}" id="slider-2" class='filter-container__range-input-2'>
-    </div>
-    <div id="range2" class='filter-container__range'>
-    ${this.formatValue2(this.selectedMax)}
-    </div>
-    </div>`
+      `;
   }
 
-  
+  getSubElements(element) {
+    const res = {};
+    const elements = element.querySelectorAll('[data-element]');
+    
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
+
+      res[name] = subElement;
+    }
+
+    return res;
+  }
+
+  initializeEvents() {
+    const { thumbLeft, thumbRight } = this.subElements;
+
+    thumbLeft.addEventListener("pointerdown", (event) =>
+      this.sliderDownEvent(event)
+    );
+
+    thumbRight.addEventListener("pointerdown", (event) =>
+      this.sliderDownEvent(event)
+    );
+  }
 
   render() {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.template;
-    this.element = wrapper.firstElementChild;
-  }
+    const element = document.createElement("div");
+    element.innerHTML = this.template;
 
-  slideOne(min = this.selectedMin){
-    this.selectedMin = parseInt(min);
-    this.fillColor();
-}
-
-  slideTwo(max = this.selectedMax){
-    this.selectedMax = parseInt(max);
-    this.fillColor();
-  }
-
-  fillColor(){
-    this.percent1 = ((this.selectedMin - this.min)  / (this.max - this.min)) * 100;
-    this.percent2 = ((this.selectedMax - this.min) / (this.max - this.min)) * 100;
-    this.render();
+    this.element = element.firstElementChild;
+    this.element.ondragstart = () => false;
+    this.subElements = this.getSubElements(element);
+    
+    this.initializeEvents();
+    this.update();
   }
 
   remove() {
-    if(this.element) {
-      this.element.remove();
-    }
+    this.element.remove();
   }
 
   destroy() {
     this.remove();
-    this.element = null;
+    document.removeEventListener("pointermove", this.sliderMoveEvent);
+    document.removeEventListener("pointerup", this.sliderUpEvent);
+  }
+
+  reset() {
+    this.selected = {
+      from: this.min,
+      to: this.max,
+    };
+
+    this.update();
   }
 }
