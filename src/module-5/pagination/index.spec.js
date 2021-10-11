@@ -1,4 +1,4 @@
-import Pagination from './solution';
+import Pagination from './solution.js'; // fix path
 
 describe('Pagination', () => {
   let pagination;
